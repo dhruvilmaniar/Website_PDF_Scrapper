@@ -1,7 +1,9 @@
-from bs4 import BeautifulSoup
 import requests
 import os
 import subprocess
+import shutil
+from bs4 import BeautifulSoup
+
 
 class UniversityFetchData():
 
@@ -13,6 +15,11 @@ class UniversityFetchData():
         self.textFilePath = os.path.join(self.destFolder,'Notifications.txt')
         self.notifications = {}
         self.pdfLinks = []
+
+        if not os.path.isdir(destination):
+            print("Destination folder does not exist... Creating new one...")
+            os.mkdir(destination)
+
         self.checkConnection()
 
     def checkConnection(self):
@@ -71,27 +78,34 @@ class UniversityFetchData():
         print("Done writing the text file...")
         subprocess.call(['notepad.exe', self.textFilePath])
 
+    @property
     def getPdfFiles(self):
 
         print("Getting PDF names...")
 
+        for date, values in self.notifications.items():
 
-
-
+            print()
+            print("#"*75)
+            print(f"Fetching pdf {date}.pdf...")
+            with requests.get(values[1], stream=True) as r:
+                with open(os.path.join(self.destFolder, f"{date}.pdf"), 'wb') as f:
+                    shutil.copyfileobj(r.raw, f)
+            print(f"File {date}.pdf saved.")
+            print("#"*75)
+            print()
 
 
 
 if __name__ == '__main__':
 
     CWD = os.getcwd()
-    DATA = os.path.join(os.path.split(CWD)[0],'Data')
+    dest_local_folder_name = 'Data'
+    DESTINATION = os.path.join(os.path.split(CWD)[0],dest_local_folder_name)
     UNIVERSITY_LINK = "http://gtu.ac.in/"
 
-    if not os.path.isdir(DATA):
-        print("No folder named Data found. Creating new one...")
-        os.mkdir(DATA)
-
-    sess = UniversityFetchData(UNIVERSITY_LINK, DATA)
+    sess = UniversityFetchData(UNIVERSITY_LINK, DESTINATION)
     sess.fetchNotifications()
     sess.printNotifications
     sess.generateTextFile
+    sess.getPdfFiles

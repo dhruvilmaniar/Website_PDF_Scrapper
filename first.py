@@ -1,5 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
+import os
+
 
 source = requests.get('http://gtu.ac.in/').text
 

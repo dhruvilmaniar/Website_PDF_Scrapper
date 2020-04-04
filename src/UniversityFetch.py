@@ -32,7 +32,13 @@ class UniversityFetchData():
 
                 temp = item.find_all('p')
                 self.pdfLinks.append(temp[1].a['href'])
-                self.notifications[temp[0].text.strip('\r\n').strip()] = temp[1].text
+
+                if not (temp[0].text.strip('\r\n').strip()) in self.notifications.keys():
+                    self.notifications[temp[0].text.strip('\r\n').strip()] = []
+
+                self.notifications[temp[0].text.strip('\r\n').strip()].append(temp[1].text)
+                self.notifications[temp[0].text.strip('\r\n').strip()].append(temp[1].a['href'])
+
             print("Notifications fetched successfully..")
         else:
             print("Please check your connections.")
@@ -40,13 +46,13 @@ class UniversityFetchData():
     @property
     def printNotifications(self):
 
-        for index, date in enumerate(self.notifications):
+        for date,values in self.notifications.items():
 
             print()
             print("#"*75)
             print(f"Date \t\t: \t{date}")
-            print(f"Notification \t: \t{self.notifications[date]}")
-            print(f"PDF Link \t: \t{self.pdfLinks[index]}")
+            print(f"Notification \t: \t{values[0]}")
+            print(f"PDF Link \t: \t{values[1]}")
             print("#"*75)
             print()
 
@@ -56,10 +62,11 @@ class UniversityFetchData():
         print("Writing the text file...")
         with open(self.textFilePath, 'w') as f:
 
-            for date, title in self.notifications.items():
+            for date, values in self.notifications.items():
 
-                f.write(f'{date} : \t{title}')
-                f.write('\n\n')
+                f.write(f'{date} : \t{values[0]}\n')
+                f.write(f'PDF Link : \t{values[1]}')
+                f.write('\n\n\n')
 
         print("Done writing the text file...")
 
@@ -87,4 +94,4 @@ if __name__ == '__main__':
     sess = UniversityFetchData(UNIVERSITY_LINK, DATA)
     sess.fetchNotifications()
     sess.printNotifications
-    # sess.generateTextFile
+    sess.generateTextFile

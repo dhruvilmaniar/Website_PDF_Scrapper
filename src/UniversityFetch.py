@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 import os
-
+import subprocess
 
 class UniversityFetchData():
 
@@ -69,7 +69,7 @@ class UniversityFetchData():
                 f.write('\n\n\n')
 
         print("Done writing the text file...")
-
+        subprocess.call(['notepad.exe', self.textFilePath])
 
     def getPdfFiles(self):
 

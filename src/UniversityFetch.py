@@ -10,6 +10,7 @@ class UniversityFetchData():
         self.link = link
         self.destFolder = destination
         self.connected = False
+        self.textFilePath = os.path.join(self.destFolder,'Notifications.txt')
         self.checkConnection()
 
     def checkConnection(self):
@@ -42,11 +43,25 @@ class UniversityFetchData():
         for date, title in self.notifications.items():
 
             print()
-            print("############################################################")
+            print("#"*75)
             print(f"Date : \t{date}")
             print(f"Notification : \t{title}")
-            print("############################################################")
+            print("#"*75)
             print()
+
+    @property
+    def generateTextFile(self):
+
+        print("Writing the text file...")
+        with open(self.textFilePath, 'w') as f:
+
+            for date, title in self.notifications.items():
+
+                f.write(f'{date} : \t{title}')
+                f.write('\n\n')
+
+        print("Done writing the text file...")
+
 
 
 if __name__ == '__main__':
@@ -61,4 +76,5 @@ if __name__ == '__main__':
 
     sess = UniversityFetchData(UNIVERSITY_LINK, DATA)
     sess.fetchNotifications()
-    sess.printNotifications
+    # sess.printNotifications
+    sess.generateTextFile

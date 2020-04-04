@@ -19,10 +19,15 @@ for i in AnnList.find_all('li', class_='marquee'):
 
 
     it = i.find_all('p')
-    notifications[it[0].text.strip('\r\n').strip()] = it[1].text
 
-for i,j in notifications.items():
-
-    print(f"Date : \t{i}")
-    print(f"Notification : \t{j}")
+    # for i in it:
     print()
+    print(it[1].a['href'])
+    print("#########")
+    # notifications[it[0].text.strip('\r\n').strip()] = it[1].text
+
+# for i,j in notifications.items():
+
+#     print(f"Date : \t{i}")
+#     print(f"Notification : \t{j}")
+#     print()

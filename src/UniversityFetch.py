@@ -11,6 +11,8 @@ class UniversityFetchData():
         self.destFolder = destination
         self.connected = False
         self.textFilePath = os.path.join(self.destFolder,'Notifications.txt')
+        self.notifications = {}
+        self.pdfLinks = []
         self.checkConnection()
 
     def checkConnection(self):
@@ -20,18 +22,16 @@ class UniversityFetchData():
         if not self.connected:
             print("Unable to connect. Please check your connection.")
 
-
     def fetchNotifications(self):
 
         if self.connected:
             soup = BeautifulSoup(requests.get(self.link).text, 'lxml')
             notificationPanel = soup.find('ul', class_='list-aggregate')
 
-            self.notifications = {}
-
             for item in notificationPanel.find_all('li', class_='marquee'):
 
                 temp = item.find_all('p')
+                self.pdfLinks.append(temp[1].a['href'])
                 self.notifications[temp[0].text.strip('\r\n').strip()] = temp[1].text
             print("Notifications fetched successfully..")
         else:
@@ -40,12 +40,13 @@ class UniversityFetchData():
     @property
     def printNotifications(self):
 
-        for date, title in self.notifications.items():
+        for index, date in enumerate(self.notifications):
 
             print()
             print("#"*75)
-            print(f"Date : \t{date}")
-            print(f"Notification : \t{title}")
+            print(f"Date \t\t: \t{date}")
+            print(f"Notification \t: \t{self.notifications[date]}")
+            print(f"PDF Link \t: \t{self.pdfLinks[index]}")
             print("#"*75)
             print()
 
@@ -63,6 +64,15 @@ class UniversityFetchData():
         print("Done writing the text file...")
 
 
+    def getPdfFiles(self):
+
+        print("Getting PDF names...")
+
+
+
+
+
+
 
 if __name__ == '__main__':
 
@@ -76,5 +86,5 @@ if __name__ == '__main__':
 
     sess = UniversityFetchData(UNIVERSITY_LINK, DATA)
     sess.fetchNotifications()
-    # sess.printNotifications
-    sess.generateTextFile
+    sess.printNotifications
+    # sess.generateTextFile

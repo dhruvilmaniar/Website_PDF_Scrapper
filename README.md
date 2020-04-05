@@ -1,17 +1,20 @@
-This Program was developed by me when we were in lockdown and each day I have to  go to the University website to see if there's any update.
+### Project Details:
+Simplest Python web scrapper, to :
+- Fetch all the notifications appearing on my University website
+- Saving them as text file (parameters saved : Date, Title, PDF link) 
+- Downloading Circulars posted by the University in Local Machine.
 
-This program fetches all the latest notifications from my universities website and saves them in a text file, and then fetches all the pdf files for this notifications.
+#### Need for this:
+It was a tedious task for me to go to the website and check for any updates during quarantine period.
 
+#### More
+- Playing with my University website from dev tools, I observed that each notifications share some common attributes. Using these to fetch only notifications from the site.
+- The pdfs are stored in the Data/ folder.
 
-In the Text file, Notification Date, Title and Notification url are saved.
-This text file opens automatically after the program fetches all the information and stores it in the file.
+### Todos:
+- [x] Run via shell script
+- [ ] Add robust try-catch blocks
+- [ ] Add logging instead of printing
+- [ ] Add Mail Function - To mail only the updates
 
-
-After this, The program starts fetching all the pdfs related to theses notifications, hosted by the website.
-
-These pdfs are stored in the Data/ folder.
-
-* Todo:
-** Add robust try-catch blocks
-** Add logging instead of pringint
 

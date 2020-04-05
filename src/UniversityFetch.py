@@ -2,6 +2,7 @@ import requests
 import os
 import subprocess
 import shutil
+import sys
 from bs4 import BeautifulSoup
 
 
@@ -18,7 +19,8 @@ class UniversityFetchData():
 
         if not os.path.isdir(destination):
             print("Destination folder does not exist... Creating new one...")
-            os.mkdir(destination)
+            os.mkdir(self.destination)
+            print(f"New folder created as : {self.destFolder}")
 
         self.checkConnection()
 
@@ -99,6 +101,8 @@ class UniversityFetchData():
 
 if __name__ == '__main__':
 
+    args = sys.argv
+
     CWD = os.getcwd()
     dest_local_folder_name = 'Data'
     DESTINATION = os.path.join(os.path.split(CWD)[0],dest_local_folder_name)
@@ -106,6 +110,10 @@ if __name__ == '__main__':
 
     sess = UniversityFetchData(UNIVERSITY_LINK, DESTINATION)
     sess.fetchNotifications()
-    sess.printNotifications
-    sess.generateTextFile
-    sess.getPdfFiles
+    if args[1] == '1':
+        sess.printNotifications
+    elif args[1] == '2':
+        sess.generateTextFile
+    elif args[1] == '3':
+        sess.generateTextFile
+        sess.getPdfFiles

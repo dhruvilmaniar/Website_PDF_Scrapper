@@ -6,7 +6,7 @@ import sys
 from bs4 import BeautifulSoup
 
 
-class UniversityFetchData():
+class UniversityFetchNotifications():
 
     def __init__(self, link, destination):
 
@@ -17,7 +17,7 @@ class UniversityFetchData():
         self.notifications = {}
         self.pdfLinks = []
 
-        if not os.path.isdir(destination):
+        if not os.path.isdir(self.destFolder):
             print("Destination folder does not exist... Creating new one...")
             os.mkdir(self.destination)
             print(f"New folder created as : {self.destFolder}")
@@ -106,12 +106,18 @@ class UniversityFetchData():
                 print()
                 print("#"*75)
                 print(f"Fetching pdf {date}.pdf...")
-                with requests.get(values[i+1], stream=True) as r:
-                    with open(os.path.join(self.destFolder, f"{date}_{i}.pdf"), 'wb') as f:
-                        shutil.copyfileobj(r.raw, f)
-                print(f"File {date}.pdf saved.")
-                print("#"*75)
-                print()
+                if ('http' in values[i+1]):
+                    # print(values[i+1])
+                    with requests.get(values[i+1], stream=True) as r:
+                        with open(os.path.join(self.destFolder, f"{date}_{i}.pdf"), 'wb') as f:
+                            shutil.copyfileobj(r.raw, f)
+                    print(f"File {date}.pdf saved.")
+                    print("#"*75)
+                    print()
+                else:
+                    print("There's no valid PDF link for this notification.")
+                    print("#"*75)
+                    print()
                 i+=2
 
 
@@ -124,12 +130,12 @@ if __name__ == '__main__':
     DESTINATION = os.path.join(os.path.split(CWD)[0],dest_local_folder_name)
     UNIVERSITY_LINK = "http://gtu.ac.in/"
 
-    sess = UniversityFetchData(UNIVERSITY_LINK, DESTINATION)
+    sess = UniversityFetchNotifications(UNIVERSITY_LINK, DESTINATION)
     sess.fetchNotifications()
     if args[1] == '1':
         sess.printNotifications
     elif args[1] == '2':
         sess.generateTextFile
     elif args[1] == '3':
-        sess.generateTextFile
+        # sess.generateTextFile
         sess.getPdfFiles

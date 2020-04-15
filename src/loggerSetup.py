@@ -1,20 +1,21 @@
 import logging
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+def get_logger(moduleName, logFilePath):
 
-formatter = logging.Formatter('[%(asctime)s] : %(name)s - %(levelname)s - %(message)s')
+    logger = logging.getLogger(moduleName)
+    logger.setLevel(logging.DEBUG)
 
-cnsl_handler = logging.StreamHandler()
-cnsl_handler.setLevel(logging.INFO)
-cnsl_handler.setFormatter(formatter)
+    formatter = logging.Formatter('[%(asctime)s] : %(name)s - %(levelname)s - %(message)s')
 
-file_handler = logging.FileHandler('FetchData.log')
-file_handler.setLevel(logging.WARNING)
-file_handler.setFormatter(formatter)
+    cnsl_handler = logging.StreamHandler()
+    cnsl_handler.setLevel(logging.INFO)
+    cnsl_handler.setFormatter(formatter)
 
-logger.addHandler(cnsl_handler)
-logger.addHandler(file_handler)
+    file_handler = logging.FileHandler(logFilePath)
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(formatter)
 
-logger.info("Program Started...")
+    logger.addHandler(cnsl_handler)
+    logger.addHandler(file_handler)
 
+    return logger

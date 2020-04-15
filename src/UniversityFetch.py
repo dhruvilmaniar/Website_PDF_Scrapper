@@ -7,8 +7,7 @@ import logging
 
 from bs4 import BeautifulSoup
 
-# from . import loggerSetup
-
+from .loggerSetup import get_logger
 
 class UniFetchNotifications():
 
@@ -21,12 +20,7 @@ class UniFetchNotifications():
         self.notifications = {}
         self.pdfLinks = []
 
-        logger.debug(f"Text File Path : ",self.textFilePath)
-
-        if not os.path.isdir(self.destFolder):
-            logger.info("Destination folder does not exist... Creating new one...")
-            os.mkdir(self.destination)
-            logger.info(f"New folder created as : {self.destFolder}")
+        logger.debug(f"Text File Path : {self.textFilePath}")
 
         self.checkConnection()
 
@@ -67,7 +61,7 @@ class UniFetchNotifications():
     @property
     def printNotifications(self):
 
-        logger.debug(self.notifications.items())
+        # logger.debug(self.notifications.items())
         for date,values in self.notifications.items():
 
             i = 0
@@ -126,25 +120,6 @@ class UniFetchNotifications():
                     print()
                 i+=2
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-formatter = logging.Formatter('[%(asctime)s] : %(name)s - %(levelname)s - %(message)s')
-
-cnsl_handler = logging.StreamHandler()
-cnsl_handler.setLevel(logging.INFO)
-cnsl_handler.setFormatter(formatter)
-
-file_handler = logging.FileHandler('FetchData.log')
-file_handler.setLevel(logging.WARNING)
-file_handler.setFormatter(formatter)
-
-logger.addHandler(cnsl_handler)
-logger.addHandler(file_handler)
-
-logger.info("Program Started...")
-
-
 
 
 if __name__ == '__main__':
@@ -153,15 +128,29 @@ if __name__ == '__main__':
 
     CWD = os.getcwd()
     dest_local_folder_name = 'Data'
-    DESTINATION = os.path.join(os.path.split(CWD)[0],dest_local_folder_name)
+    DESTINATION = os.path.join(CWD,dest_local_folder_name)
     UNIVERSITY_LINK = "http://gtu.ac.in/"
+    LOG_FILE_PATH = os.path.join(DESTINATION, 'UniversityFetch.log')
+
+    if not os.path.isdir(DESTINATION):
+        logger.info("Destination folder does not exist... Creating new one...")
+        os.mkdir(DESTINATION)
+        logger.info(f"New folder created as : {DESTINATION}")
+
+    logger = get_logger(__name__, LOG_FILE_PATH)
+    logger.info("Program Started...")
+
+    logger.debug(LOG_FILE_PATH)
 
     sess = UniFetchNotifications(UNIVERSITY_LINK, DESTINATION)
     sess.fetchNotifications()
     if args[1] == '1':
         sess.printNotifications
+        logger.info("Showing output to the console only..")
     elif args[1] == '2':
+        logger.info("Showing output to a text file..")
         sess.generateTextFile
     elif args[1] == '3':
+        logger.info("Downloading all the PDF files..")
         # sess.generateTextFile
         sess.getPdfFiles

@@ -3,10 +3,14 @@ import os
 import subprocess
 import shutil
 import sys
+import logging
+
 from bs4 import BeautifulSoup
 
+# from . import loggerSetup
 
-class UniversityFetchNotifications():
+
+class UniFetchNotifications():
 
     def __init__(self, link, destination):
 
@@ -17,10 +21,12 @@ class UniversityFetchNotifications():
         self.notifications = {}
         self.pdfLinks = []
 
+        logger.debug(f"Text File Path : ",self.textFilePath)
+
         if not os.path.isdir(self.destFolder):
-            print("Destination folder does not exist... Creating new one...")
+            logger.info("Destination folder does not exist... Creating new one...")
             os.mkdir(self.destination)
-            print(f"New folder created as : {self.destFolder}")
+            logger.info(f"New folder created as : {self.destFolder}")
 
         self.checkConnection()
 
@@ -29,7 +35,7 @@ class UniversityFetchNotifications():
         checkConnected = requests.get(self.link).status_code
         self.connected = True if checkConnected == 200 else False
         if not self.connected:
-            print("Unable to connect. Please check your connection.")
+            logger.warning("Unable to connect. Please check your connection.")
 
     def fetchNotifications(self):
 
@@ -54,14 +60,14 @@ class UniversityFetchNotifications():
                     self.notifications[temp[0].text.strip('\r\n').strip()].append("PDF Not provided in the Notifications.")
 
 
-            print("Notifications fetched successfully..")
+            logger.info("Notifications fetched successfully..")
         else:
-            print("Please check your connections.")
+            logger.warning("Please check your connections.")
 
     @property
     def printNotifications(self):
 
-        print(self.notifications.items())
+        logger.debug(self.notifications.items())
         for date,values in self.notifications.items():
 
             i = 0
@@ -79,7 +85,7 @@ class UniversityFetchNotifications():
     @property
     def generateTextFile(self):
 
-        print("Writing the text file...")
+        logger.info("Writing the text file...")
         with open(self.textFilePath, 'w') as f:
 
             for date, values in self.notifications.items():
@@ -91,13 +97,13 @@ class UniversityFetchNotifications():
                     f.write('\n\n\n')
                     i+=2;
 
-        print("Done writing the text file...")
+        logger.info("Done writing the text file...")
         subprocess.call(['notepad.exe', self.textFilePath])
 
     @property
     def getPdfFiles(self):
 
-        print("Getting PDF names...")
+        logger.info("Getting PDF names...")
 
         for date, values in self.notifications.items():
 
@@ -107,7 +113,7 @@ class UniversityFetchNotifications():
                 print("#"*75)
                 print(f"Fetching pdf {date}.pdf...")
                 if ('http' in values[i+1]):
-                    # print(values[i+1])
+                    # logger.debug(values[i+1])
                     with requests.get(values[i+1], stream=True) as r:
                         with open(os.path.join(self.destFolder, f"{date}_{i}.pdf"), 'wb') as f:
                             shutil.copyfileobj(r.raw, f)
@@ -120,6 +126,26 @@ class UniversityFetchNotifications():
                     print()
                 i+=2
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+formatter = logging.Formatter('[%(asctime)s] : %(name)s - %(levelname)s - %(message)s')
+
+cnsl_handler = logging.StreamHandler()
+cnsl_handler.setLevel(logging.INFO)
+cnsl_handler.setFormatter(formatter)
+
+file_handler = logging.FileHandler('FetchData.log')
+file_handler.setLevel(logging.WARNING)
+file_handler.setFormatter(formatter)
+
+logger.addHandler(cnsl_handler)
+logger.addHandler(file_handler)
+
+logger.info("Program Started...")
+
+
+
 
 if __name__ == '__main__':
 
@@ -130,7 +156,7 @@ if __name__ == '__main__':
     DESTINATION = os.path.join(os.path.split(CWD)[0],dest_local_folder_name)
     UNIVERSITY_LINK = "http://gtu.ac.in/"
 
-    sess = UniversityFetchNotifications(UNIVERSITY_LINK, DESTINATION)
+    sess = UniFetchNotifications(UNIVERSITY_LINK, DESTINATION)
     sess.fetchNotifications()
     if args[1] == '1':
         sess.printNotifications

@@ -40,13 +40,19 @@ class UniversityFetchData():
             for item in notificationPanel.find_all('li', class_='marquee'):
 
                 temp = item.find_all('p')
-                self.pdfLinks.append(temp[1].a['href'])
+
 
                 if not (temp[0].text.strip('\r\n').strip()) in self.notifications.keys():
                     self.notifications[temp[0].text.strip('\r\n').strip()] = []
 
                 self.notifications[temp[0].text.strip('\r\n').strip()].append(temp[1].text)
-                self.notifications[temp[0].text.strip('\r\n').strip()].append(temp[1].a['href'])
+
+                try:
+                    self.pdfLinks.append(temp[1].a['href'])
+                    self.notifications[temp[0].text.strip('\r\n').strip()].append(temp[1].a['href'])
+                except TypeError:
+                    self.notifications[temp[0].text.strip('\r\n').strip()].append("PDF Not provided in the Notifications.")
+
 
             print("Notifications fetched successfully..")
         else:
@@ -55,15 +61,20 @@ class UniversityFetchData():
     @property
     def printNotifications(self):
 
+        print(self.notifications.items())
         for date,values in self.notifications.items():
 
-            print()
-            print("#"*75)
-            print(f"Date \t\t: \t{date}")
-            print(f"Notification \t: \t{values[0]}")
-            print(f"PDF Link \t: \t{values[1]}")
-            print("#"*75)
-            print()
+            i = 0
+            while(i<len(values)):
+                print()
+                print("#"*75)
+                print(f"Date \t\t: \t{date}")
+                print(f"Notification \t: \t{values[i]}")
+                print(f"PDF Link \t: \t{values[i+1]}")
+                print("#"*75)
+                print()
+                i+=2
+
 
     @property
     def generateTextFile(self):
@@ -73,9 +84,12 @@ class UniversityFetchData():
 
             for date, values in self.notifications.items():
 
-                f.write(f'{date} : \t{values[0]}\n')
-                f.write(f'PDF Link : \t{values[1]}')
-                f.write('\n\n\n')
+                i = 0
+                while (i<len(values)):
+                    f.write(f'{date} : \t{values[i]}\n')
+                    f.write(f'PDF Link : \t{values[i+1]}')
+                    f.write('\n\n\n')
+                    i+=2;
 
         print("Done writing the text file...")
         subprocess.call(['notepad.exe', self.textFilePath])
@@ -87,16 +101,18 @@ class UniversityFetchData():
 
         for date, values in self.notifications.items():
 
-            print()
-            print("#"*75)
-            print(f"Fetching pdf {date}.pdf...")
-            with requests.get(values[1], stream=True) as r:
-                with open(os.path.join(self.destFolder, f"{date}.pdf"), 'wb') as f:
-                    shutil.copyfileobj(r.raw, f)
-            print(f"File {date}.pdf saved.")
-            print("#"*75)
-            print()
-
+            i = 0
+            while (i<len(values)):
+                print()
+                print("#"*75)
+                print(f"Fetching pdf {date}.pdf...")
+                with requests.get(values[i+1], stream=True) as r:
+                    with open(os.path.join(self.destFolder, f"{date}_{i}.pdf"), 'wb') as f:
+                        shutil.copyfileobj(r.raw, f)
+                print(f"File {date}.pdf saved.")
+                print("#"*75)
+                print()
+                i+=2
 
 
 if __name__ == '__main__':

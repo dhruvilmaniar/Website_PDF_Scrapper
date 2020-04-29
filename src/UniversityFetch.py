@@ -4,6 +4,7 @@ import subprocess
 import shutil
 import sys
 import logging
+from datetime import datetime
 
 from bs4 import BeautifulSoup
 
@@ -17,10 +18,15 @@ class UniFetchNotifications():
         self.destFolder = destination
         self.connected = False
         self.textFilePath = os.path.join(self.destFolder,'Notifications.txt')
+        self.fetchLogsFilePath = os.path.join(self.destFolder, 'FetchLogs.log')
         self.notifications = {}
         self.pdfLinks = []
 
         logger.debug(f"Text File Path : {self.textFilePath}")
+
+        if not os.path.isfile(self.fetchLogsFilePath):
+            with open(self.fetchLogsFilePath, 'w'): pass
+
 
         self.checkConnection()
 
@@ -54,6 +60,7 @@ class UniFetchNotifications():
                     self.notifications[temp[0].text.strip('\r\n').strip()].append("PDF Not provided in the Notifications.")
 
 
+            self.latestNotificationDate = datetime.strptime(next(iter(self.notifications.keys())), '%d-%b-%Y')
             logger.info("Notifications fetched successfully..")
         else:
             logger.warning("Please check your connections.")
@@ -75,14 +82,44 @@ class UniFetchNotifications():
                 print()
                 i+=2
 
+        with open(self.fetchLogsFilePath, 'w') as f:
+            f.write(self.latestNotificationDate)
+
 
     # TODO: Complete printNotificationsUpdates Method
     @property
     def printNotificationsUpdates(self):
 
-        if os.path.isfile(self.textFilePath):
-            with open(self.textFilePath, 'r') as f:
-                print(f.readline()[])
+        if os.path.isfile(self.fetchLogsFilePath):
+            with open(self.fetchLogsFilePath, 'r') as f:
+                # print(f.readlines()[0])
+                print(f.readline())
+                lastReadDate = datetime.strptime(f.readline(), '%d-%b-%Y')
+            print(lastReadDate)
+            print(self.latestNotificationDate)
+            difference = (self.latestNotificationDate - lastReadDate).days
+
+            if difference>=7:
+
+                for date,values in self.notifications.items():
+                            print(datetime.strptime(date, '%d-%b-%Y'), lastReadDate)
+                            if ((datetime.strptime(date, '%d-%b-%Y') - lastReadDate).days >= 7):
+                                i = 0
+                                while(i<len(values)):
+                                    print()
+                                    print("#"*75)
+                                    print(f"Date \t\t: \t{date}")
+                                    print(f"Notification \t: \t{values[i]}")
+                                    print(f"PDF Link \t: \t{values[i+1]}")
+                                    print("#"*75)
+                                    print()
+                                    i+=2
+
+                            # with open(self.fetchLogsFilePath, 'w') as f:
+                            #     f.write(date)
+
+
+
         else:
             print("File does not exist")
 
@@ -157,7 +194,7 @@ if __name__ == '__main__':
     if args[1] == '1':
         logger.info("Showing output to the console only..")
         sess.printNotificationsUpdates
-        # sess.printNotifications
+        # sess.printNotificationsAll
     elif args[1] == '2':
         logger.info("Showing output to a text file..")
         sess.generateTextFile

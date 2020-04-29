@@ -93,30 +93,35 @@ class UniFetchNotifications():
         if os.path.isfile(self.fetchLogsFilePath):
             with open(self.fetchLogsFilePath, 'r') as f:
                 # print(f.readlines()[0])
-                print(f.readline())
-                lastReadDate = datetime.strptime(f.readline(), '%d-%b-%Y')
-            print(lastReadDate)
-            print(self.latestNotificationDate)
+                lastReadDate = datetime.strptime(f.readline().rstrip('\n'), '%d-%b-%Y')
+            # print(lastReadDate)
+            # print(self.latestNotificationDate)
             difference = (self.latestNotificationDate - lastReadDate).days
 
             if difference>=7:
 
                 for date,values in self.notifications.items():
-                            print(datetime.strptime(date, '%d-%b-%Y'), lastReadDate)
-                            if ((datetime.strptime(date, '%d-%b-%Y') - lastReadDate).days >= 7):
-                                i = 0
-                                while(i<len(values)):
-                                    print()
-                                    print("#"*75)
-                                    print(f"Date \t\t: \t{date}")
-                                    print(f"Notification \t: \t{values[i]}")
-                                    print(f"PDF Link \t: \t{values[i+1]}")
-                                    print("#"*75)
-                                    print()
-                                    i+=2
+                    logger.debug(datetime.strptime(date, '%d-%b-%Y'), lastReadDate, (datetime.strptime(date, '%d-%b-%Y') - lastReadDate).days)
 
-                            # with open(self.fetchLogsFilePath, 'w') as f:
-                            #     f.write(date)
+                    # -1 so that we can see the last seen notification also.
+                    if ((datetime.strptime(date, '%d-%b-%Y') - lastReadDate).days >= -1):
+                        i = 0
+                        while(i<len(values)):
+                            print()
+                            print("#"*75)
+                            print(f"Date \t\t: \t{date}")
+                            print(f"Notification \t: \t{values[i]}")
+                            print(f"PDF Link \t: \t{values[i+1]}")
+                            print("#"*75)
+                            print()
+                            i+=2
+
+            else:
+
+                logger.info("No new notifications.")
+
+            with open(self.fetchLogsFilePath, 'w') as f:
+                f.write(next(iter(self.notifications.keys())))
 
 
 

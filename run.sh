@@ -9,9 +9,10 @@ then
     echo "##"
     echo "##    Syntax : run.sh 1|2|3"
     echo "##    Options:"
-    echo "##    1    Print data to console only."
-    echo "##    2    Write data to a text file."
-    echo "##    3    Download all notifications pdf files."
+    echo "##    1    Print Updates to console only."
+    echo "##    2    Print all notifications to console only."
+    echo "##    3    Write data to a text file."
+    echo "##    4    Download all notifications pdf files."
     echo "##"
     echo "##    Text files and PDFs will be saved in ./Data Folder."
     echo "##"
@@ -27,6 +28,9 @@ else
     elif (($MODE == "3"))
     then
         python -m src.UniversityFetch 3
+    elif (($MODE == "4"))
+    then
+        python -m src.UniversityFetch 4
     else
         echo "Wrong option!"
     fi

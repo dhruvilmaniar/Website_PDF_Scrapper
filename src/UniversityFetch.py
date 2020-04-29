@@ -83,50 +83,49 @@ class UniFetchNotifications():
                 i+=2
 
         with open(self.fetchLogsFilePath, 'w') as f:
-            f.write(self.latestNotificationDate)
+            f.write(next(iter(self.notifications.keys())))
+            logger.info(f"Last Seen date Updated to {next(iter(self.notifications.keys()))}")
 
 
-    # TODO: Complete printNotificationsUpdates Method
     @property
     def printNotificationsUpdates(self):
 
-        if os.path.isfile(self.fetchLogsFilePath):
-            with open(self.fetchLogsFilePath, 'r') as f:
-                # print(f.readlines()[0])
-                lastReadDate = datetime.strptime(f.readline().rstrip('\n'), '%d-%b-%Y')
-            # print(lastReadDate)
-            # print(self.latestNotificationDate)
-            difference = (self.latestNotificationDate - lastReadDate).days
+        with open(self.fetchLogsFilePath, 'r') as f:
 
-            if difference>=7:
+            lastReadDateStr = f.readline().rstrip('\n')
+            if lastReadDateStr == '':
+                lastReadDateStr = "01-Jan-2020"
+                logger.info("No last seen date found.")
+                logger.info("Showing all notifications from beginnig of the year...")
+            lastReadDate = datetime.strptime(lastReadDateStr, '%d-%b-%Y')
 
-                for date,values in self.notifications.items():
-                    logger.debug(datetime.strptime(date, '%d-%b-%Y'), lastReadDate, (datetime.strptime(date, '%d-%b-%Y') - lastReadDate).days)
+        difference = (self.latestNotificationDate - lastReadDate).days
 
-                    # -1 so that we can see the last seen notification also.
-                    if ((datetime.strptime(date, '%d-%b-%Y') - lastReadDate).days >= -1):
-                        i = 0
-                        while(i<len(values)):
-                            print()
-                            print("#"*75)
-                            print(f"Date \t\t: \t{date}")
-                            print(f"Notification \t: \t{values[i]}")
-                            print(f"PDF Link \t: \t{values[i+1]}")
-                            print("#"*75)
-                            print()
-                            i+=2
+        if difference>=7:
 
-            else:
+            for date,values in self.notifications.items():
+                logger.debug(datetime.strptime(date, '%d-%b-%Y'), lastReadDate, (datetime.strptime(date, '%d-%b-%Y') - lastReadDate).days)
 
-                logger.info("No new notifications.")
-
-            with open(self.fetchLogsFilePath, 'w') as f:
-                f.write(next(iter(self.notifications.keys())))
-
-
+                # -1 so that we can see the last seen notification also.
+                if ((datetime.strptime(date, '%d-%b-%Y') - lastReadDate).days >= -1):
+                    i = 0
+                    while(i<len(values)):
+                        print()
+                        print("#"*75)
+                        print(f"Date \t\t: \t{date}")
+                        print(f"Notification \t: \t{values[i]}")
+                        print(f"PDF Link \t: \t{values[i+1]}")
+                        print("#"*75)
+                        print()
+                        i+=2
 
         else:
-            print("File does not exist")
+
+            logger.info("No new notifications.")
+
+        with open(self.fetchLogsFilePath, 'w') as f:
+            f.write(next(iter(self.notifications.keys())))
+            logger.info(f"Last Seen date Updated to {next(iter(self.notifications.keys()))}")
 
     @property
     def generateTextFile(self):
@@ -199,11 +198,13 @@ if __name__ == '__main__':
     if args[1] == '1':
         logger.info("Showing output to the console only..")
         sess.printNotificationsUpdates
-        # sess.printNotificationsAll
     elif args[1] == '2':
+        logger.info("Showing all the notifications to the console only...")
+        sess.printNotificationsAll
+    elif args[1] == '3':
         logger.info("Showing output to a text file..")
         sess.generateTextFile
-    elif args[1] == '3':
+    elif args[1] == '4':
         logger.info("Downloading all the PDF files..")
         # sess.generateTextFile
         sess.getPdfFiles

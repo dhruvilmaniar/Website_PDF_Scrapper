@@ -59,7 +59,7 @@ class UniFetchNotifications():
             logger.warning("Please check your connections.")
 
     @property
-    def printNotifications(self):
+    def printNotificationsAll(self):
 
         # logger.debug(self.notifications.items())
         for date,values in self.notifications.items():
@@ -75,6 +75,16 @@ class UniFetchNotifications():
                 print()
                 i+=2
 
+
+    # TODO: Complete printNotificationsUpdates Method
+    @property
+    def printNotificationsUpdates(self):
+
+        if os.path.isfile(self.textFilePath):
+            with open(self.textFilePath, 'r') as f:
+                print(f.readline()[])
+        else:
+            print("File does not exist")
 
     @property
     def generateTextFile(self):
@@ -145,8 +155,9 @@ if __name__ == '__main__':
     sess = UniFetchNotifications(UNIVERSITY_LINK, DESTINATION)
     sess.fetchNotifications()
     if args[1] == '1':
-        sess.printNotifications
         logger.info("Showing output to the console only..")
+        sess.printNotificationsUpdates
+        # sess.printNotifications
     elif args[1] == '2':
         logger.info("Showing output to a text file..")
         sess.generateTextFile

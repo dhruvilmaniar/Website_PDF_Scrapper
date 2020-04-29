@@ -2,3 +2,4 @@ first.py
 *.pdf
 __pycache__
 *.log
+src/temp.py

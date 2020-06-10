@@ -25,7 +25,7 @@ class UniFetchNotifications():
         logger.debug(f"Text File Path : {self.textFilePath}")
 
         if not os.path.isfile(self.fetchLogsFilePath):
-            with open(self.fetchLogsFilePath, 'w'): pass
+            with open(self.fetchLogsFilePath, 'w', encoding="utf-8"): pass
 
 
         self.checkConnection()
@@ -82,7 +82,7 @@ class UniFetchNotifications():
                 print()
                 i+=2
 
-        with open(self.fetchLogsFilePath, 'w') as f:
+        with open(self.fetchLogsFilePath, 'w', encoding="utf-8") as f:
             f.write(next(iter(self.notifications.keys())))
             logger.info(f"Last Seen date Updated to {next(iter(self.notifications.keys()))}")
 
@@ -90,7 +90,7 @@ class UniFetchNotifications():
     @property
     def printNotificationsUpdates(self):
 
-        with open(self.fetchLogsFilePath, 'r') as f:
+        with open(self.fetchLogsFilePath, 'r', encoding="utf-8") as f:
 
             lastReadDateStr = f.readline().rstrip('\n')
             if lastReadDateStr == '':
@@ -123,7 +123,7 @@ class UniFetchNotifications():
 
             logger.info("No new notifications.")
 
-        with open(self.fetchLogsFilePath, 'w') as f:
+        with open(self.fetchLogsFilePath, 'w', encoding="utf-8") as f:
             f.write(next(iter(self.notifications.keys())))
             logger.info(f"Last Seen date Updated to {next(iter(self.notifications.keys()))}")
 
@@ -131,7 +131,7 @@ class UniFetchNotifications():
     def generateTextFile(self):
 
         logger.info("Writing the text file...")
-        with open(self.textFilePath, 'w') as f:
+        with open(self.textFilePath, 'w', encoding="utf-8") as f:
 
             for date, values in self.notifications.items():
 
@@ -160,7 +160,7 @@ class UniFetchNotifications():
                 if ('http' in values[i+1]):
                     # logger.debug(values[i+1])
                     with requests.get(values[i+1], stream=True) as r:
-                        with open(os.path.join(self.destFolder, f"{date}_{i}.pdf"), 'wb') as f:
+                        with open(os.path.join(self.destFolder, f"{date}_{i}.pdf"), 'wb', encoding="utf-8") as f:
                             shutil.copyfileobj(r.raw, f)
                     print(f"File {date}.pdf saved.")
                     print("#"*75)

@@ -4,6 +4,19 @@ Simplest Python web scrapper, to :
 - Saving them as text file (parameters saved : Date, Title, PDF link) 
 - Downloading Circulars posted by the University in Local Machine.
 
+### Usage:
+Use bash to clone or download this repository.
+
+For bash use:
+```git clone https://github.com/dhruvilmaniar/Website_PDF_Scrapper```
+
+After that, run the following command:
+```pip install -r requirenments.txt```
+
+After that, run ```sh run.sh``` or ```run.sh``` based on your system.
+You should now see various options allowed as args.
+
+
 #### Need for this:
 It was a tedious task for me to go to the website and check for any updates during quarantine period.
 
@@ -14,8 +27,6 @@ It was a tedious task for me to go to the website and check for any updates duri
 
 ### Todos:
 - [x] Run via shell script
-- [ ] Add robust try-catch blocks
 - [x] Add logging instead of printing
-- [ ] Add Mail Function - To mail only the updates
 
 
